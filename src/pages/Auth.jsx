@@ -24,14 +24,21 @@ export default function Auth() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-    const endpoint = isLogin ? "http://127.0.0.1:5000/login" : "http://127.0.0.1:5000/register";
+
+    // --- UPDATED TO LIVE RENDER URL ---
+    const endpoint = isLogin 
+      ? "https://plagirism-backend.onrender.com/login" 
+      : "https://plagirism-backend.onrender.com/register";
+
     try {
       const response = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
+
       const data = await response.json();
+
       if (response.ok) {
         if (isLogin) {
           localStorage.setItem("userToken", data.access_token);
@@ -49,14 +56,15 @@ export default function Auth() {
         setError(data.msg || "Something went wrong.");
       }
     } catch (err) {
-      setError("Cannot connect to server.");
+      // Free tier servers take ~30s to wake up if they haven't been used recently
+      setError("Cannot connect to server. The AI engine is waking up, please try again in 30 seconds.");
     }
   };
 
   const inputStyle = {
     mb: 2,
     "& .MuiOutlinedInput-root": {
-      color: "#f8fafc", // High contrast white
+      color: "#f8fafc",
       fontFamily: "'Inter', sans-serif",
       "& fieldset": { borderColor: "#1e293b" },
       "&:hover fieldset": { borderColor: "#3b82f6" },

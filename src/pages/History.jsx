@@ -23,12 +23,17 @@ export default function History() {
         return;
       }
 
+      // Handle potential double-quotes in local storage
       const cleanToken = token.startsWith('"') ? JSON.parse(token) : token;
 
       try {
-        const response = await fetch("http://127.0.0.1:5000/history", {
+        // --- UPDATED TO LIVE RENDER URL ---
+        const response = await fetch("https://plagirism-backend.onrender.com/history", {
           method: "GET",
-          headers: { "Authorization": `Bearer ${cleanToken.trim()}` }
+          headers: { 
+            "Authorization": `Bearer ${cleanToken.trim()}`,
+            "Content-Type": "application/json"
+          }
         });
 
         const data = await response.json();
@@ -42,7 +47,7 @@ export default function History() {
           setError(data.msg || "Failed to load history.");
         }
       } catch (err) {
-        setError("Backend unreachable. Please check your connection.");
+        setError("Backend unreachable. The AI engine might be waking up, please refresh in 30 seconds.");
       } finally {
         setLoading(false);
       }
@@ -78,7 +83,6 @@ export default function History() {
     }}>
       <Header />
 
-      {/* Internal Scrollable Content */}
       <Box component="main" sx={{ 
         flexGrow: 1, 
         overflowY: "auto", 
@@ -171,7 +175,14 @@ export default function History() {
                       </TableCell>
                       <TableCell align="right">
                         <IconButton 
-                          onClick={() => navigate("/results", { state: { score: row.score, text: row.full_text, analysis: row.analysis } })} 
+                          onClick={() => navigate("/results", { 
+                            state: { 
+                                score: row.score, 
+                                text: row.full_text, 
+                                analysis: row.analysis,
+                                ai_insight: row.ai_insight 
+                            } 
+                          })} 
                           sx={{ 
                               color: "#3b82f6",
                               "&:hover": { backgroundColor: "rgba(59, 130, 246, 0.1)", color: "#60a5fa" }

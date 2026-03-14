@@ -6,185 +6,50 @@ import Footer from "../components/Footer";
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
 
 const QUOTE_LIBRARY = {
-
-
-
   low: [
-
-
-
     "Integrity at its finest! Your original thought shines through.",
-
-
-
     "Your unique voice is your greatest strength. Keep it up!",
-
-
-
     "Exceptional work! You've mastered the art of independent thought.",
-
-
-
     "Authenticity is the soul of great writing. Well done!",
-
-
-
     "A breath of fresh air! Your content is remarkably original.",
-
-
-
     "Pure originality! You have a clear and distinct perspective.",
-
-
-
     "Great job maintaining academic honesty in this document.",
-
-
-
     "Your writing reflects a deep and personal understanding of the topic.",
-
-
-
     "Outstanding! This is a textbook example of original work.",
-
-
-
     "Excellence in every word! Your creative spark is evident here."
-
-
-
   ],
-
-
-
   moderate: [
-
-
-
     "Good start! A few more citations will make this work rock solid.",
-
-
-
     "Strong effort! Fine-tune your references to elevate this piece.",
-
-
-
     "Solid content! Remember that proper attribution builds credibility.",
-
-
-
     "Almost there! Just a few sections need your unique personal touch.",
-
-
-
     "Good work, but be sure to paraphrase more effectively in matched areas.",
-
-
-
     "A solid draft! Strengthening your citations will perfect it.",
-
-
-
     "Well structured! Adding more of your own analysis will balance the sources.",
-
-
-
     "Steady progress! Ensure all borrowed ideas are clearly credited.",
-
-
-
     "You have a good flow; just polish the quoted segments for better clarity.",
-
-
-
     "A respectable effort! Focus on synthesizing your sources more deeply."
-
-
-
   ],
-
-
-
   high: [
-
-
-
     "Your ideas are worth sharing—try expressing them in your own words.",
-
-
-
     "Use these matches as a helpful guide to rewrite your narrative.",
-
-
-
     "Focus on synthesizing facts into your own unique framework.",
-
-
-
     "A bit too much borrowing—let's see more of 'YOU' in this draft.",
-
-
-
     "Try to step back and explain these concepts from your own memory.",
-
-
-
     "Your voice is getting lost among your sources; let's bring it back.",
-
-
-
     "Great research! Now, transform those findings into your own language.",
-
-
-
     "Significant overlap detected. This is a great chance to refine your style.",
-
-
-
     "Challenge yourself to summarize these external ideas without looking at them.",
-
-
-
     "You have the data; now give us your unique interpretation of it."
-
-
-
   ],
-
-
-
   critical: [
-
-
-
     "Mistakes are portals of discovery. Let's try a fresh, new start!",
-
-
-
     "Honest work is the most rewarding. Let's aim for 100% you next time.",
-
-
-
     "Let your own voice be the hero of your next revision.",
-
-
-
     "Revising this is a great chance to really master the material deeply.",
-
-
-
     "Don't be discouraged—use this report as a map to find your own voice.",
-
-
-
     "Writing is a journey. Let's take a different path for this section.",
-
-
-
     "True learning happens when you put ideas into your own words.",
-
-
-
     "You have the potential! Let's strip away the noise and hear your thoughts.",
     "A fresh draft will help you internalize these concepts much better.",
     "This is a learning moment. Let's rebuild this content from the ground up."
@@ -193,10 +58,12 @@ const QUOTE_LIBRARY = {
 
 export default function Results() {
   const location = useLocation();
+  
+  // Data passed from the Upload.jsx or History.jsx navigate call
   const rawText = location.state?.text || "No content available.";
   const plagiarismPercent = location.state?.score ?? 0;
   const analysis = location.state?.analysis || []; 
-  const aiInsight = location.state?.ai_insight || "No specific AI insights generated for this scan.";
+  const aiInsight = location.state?.ai_insight || "Our AI engine is still calculating deeper insights for this document.";
 
   const feedback = useMemo(() => {
     let category = plagiarismPercent <= 10 ? "low" : plagiarismPercent <= 40 ? "moderate" : plagiarismPercent <= 70 ? "high" : "critical";
@@ -204,13 +71,23 @@ export default function Results() {
     return quotes[Math.floor(Math.random() * quotes.length)];
   }, [plagiarismPercent]);
 
-  const chartData = [{ name: "Plagiarized", value: plagiarismPercent }, { name: "Original", value: 100 - plagiarismPercent }];
+  const chartData = [
+    { name: "Plagiarized", value: plagiarismPercent }, 
+    { name: "Original", value: 100 - plagiarismPercent }
+  ];
   const COLORS = ["#3b82f6", "#1e293b"];
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", height: "100vh", overflow: "hidden", backgroundColor: "#000000", fontFamily: "'Inter', sans-serif" }}>
       <Header />
-      <Box component="main" sx={{ flexGrow: 1, overflowY: "auto", py: 6 }}>
+      <Box component="main" sx={{ 
+        flexGrow: 1, 
+        overflowY: "auto", 
+        py: 6,
+        "&::-webkit-scrollbar": { width: "8px" },
+        "&::-webkit-scrollbar-track": { background: "#000" },
+        "&::-webkit-scrollbar-thumb": { background: "#1e293b", borderRadius: "10px" } 
+      }}>
         <Container maxWidth="md">
           <Typography variant="h3" fontWeight="800" sx={{ mb: 4, textAlign: "center", background: "linear-gradient(90deg, #ffffff, #60a5fa)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", fontFamily: "'Poppins', sans-serif" }}>
             Analysis Report
@@ -236,7 +113,7 @@ export default function Results() {
             </CardContent>
           </Card>
 
-          {/* NEW: AI Semantic Insight Box */}
+          {/* AI Semantic Insight Box */}
           <Card sx={{ backgroundColor: "#1e293b", border: "1px solid #3b82f6", borderRadius: 5, color: "white", mb: 4, p: 4, boxShadow: "0 0 20px rgba(59, 130, 246, 0.15)" }}>
             <Typography variant="h6" sx={{ color: "#60a5fa", fontWeight: "800", mb: 1, display: "flex", alignItems: "center", gap: 1 }}>
               ✨ AI Semantic Insight
@@ -254,7 +131,11 @@ export default function Results() {
             </Box>
             <Box sx={{ p: 5, color: "#1e293b", lineHeight: 2, fontSize: "1.1rem", textAlign: "justify" }}>
               {analysis.length > 0 ? analysis.map((item, index) => (
-                <span key={index} style={{ backgroundColor: item.isPlagiarized ? "#fff3bf" : "transparent", borderBottom: item.isPlagiarized ? "2px solid #fab005" : "none", padding: "2px 0" }}>
+                <span key={index} style={{ 
+                    backgroundColor: item.isPlagiarized ? "#fff3bf" : "transparent", 
+                    borderBottom: item.isPlagiarized ? "2px solid #fab005" : "none", 
+                    padding: "2px 0" 
+                }}>
                   {item.text}{" "}
                 </span>
               )) : <Typography sx={{ whiteSpace: "pre-wrap" }}>{rawText}</Typography>}

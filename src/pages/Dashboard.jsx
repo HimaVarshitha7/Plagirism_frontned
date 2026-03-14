@@ -14,9 +14,22 @@ export default function Dashboard() {
     const fetchStats = async () => {
       try {
         const token = localStorage.getItem("userToken");
-        const res = await fetch("http://127.0.0.1:5000/history", {
-          headers: { "Authorization": `Bearer ${token}` }
+        if (!token) {
+          navigate("/auth");
+          return;
+        }
+
+        // Clean the token in case it's stored as a stringified JSON
+        const cleanToken = token.startsWith('"') ? JSON.parse(token) : token;
+
+        // --- UPDATED TO LIVE RENDER URL ---
+        const res = await fetch("https://plagirism-backend.onrender.com/history", {
+          headers: { 
+            "Authorization": `Bearer ${cleanToken.trim()}`,
+            "Content-Type": "application/json"
+          }
         });
+
         const data = await res.json();
         if (Array.isArray(data)) {
           const plag = data.filter(s => s.score > 20).length;
@@ -27,13 +40,13 @@ export default function Dashboard() {
           });
         }
       } catch (err) {
-        console.error("Failed to fetch stats");
+        console.error("Failed to fetch stats:", err);
       } finally {
         setLoading(false);
       }
     };
     fetchStats();
-  }, []);
+  }, [navigate]);
 
   const StatCard = ({ title, value, icon, color, subtitle }) => (
     <Card sx={{ 

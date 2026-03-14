@@ -26,7 +26,8 @@ export default function Profile() {
     const cleanToken = token.startsWith('"') ? JSON.parse(token) : token;
 
     try {
-      const response = await fetch("http://127.0.0.1:5000/profile", {
+      // --- UPDATED TO LIVE RENDER URL ---
+      const response = await fetch("https://plagirism-backend.onrender.com/profile", {
         method: "GET",
         headers: { 
           "Authorization": `Bearer ${cleanToken.trim()}`,
@@ -44,7 +45,7 @@ export default function Profile() {
         setError(errorData.msg || "Error loading profile.");
       }
     } catch (err) {
-      setError("Backend unreachable. Check if Flask is running.");
+      setError("Backend unreachable. The server might be waking up, please refresh in 30 seconds.");
     } finally {
       setLoading(false);
     }
@@ -60,7 +61,8 @@ export default function Profile() {
     const cleanToken = token.startsWith('"') ? JSON.parse(token) : token;
 
     try {
-      const response = await fetch("http://127.0.0.1:5000/profile", {
+      // --- UPDATED TO LIVE RENDER URL ---
+      const response = await fetch("https://plagirism-backend.onrender.com/profile", {
         method: "PUT",
         headers: { 
           "Authorization": `Bearer ${cleanToken.trim()}`,
@@ -78,7 +80,7 @@ export default function Profile() {
         setError("Failed to save profile.");
       }
     } catch (err) {
-      setError("Error connecting to server.");
+      setError("Error connecting to server. Please try again.");
     }
   };
 
