@@ -4,6 +4,8 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { useNavigate } from "react-router-dom";
 import { Add, Analytics, BugReport, AssignmentTurnedIn } from "@mui/icons-material";
+// --- IMPORT ADDED ---
+import { API_BASE_URL } from "../config";
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -19,18 +21,16 @@ export default function Dashboard() {
           return;
         }
 
-        // Clean the token in case it's stored as a stringified JSON
         const cleanToken = token.startsWith('"') ? JSON.parse(token) : token;
 
-        // --- UPDATED TO LIVE RENDER URL ---
-       
-const res = await fetch(`${API_BASE_URL}/history`, {
-   method: "GET",
-    headers: { 
-        "Authorization": `Bearer ${cleanToken.trim()}`,
-        "Content-Type": "application/json"
-    }
-});
+        const res = await fetch(`${API_BASE_URL}/history`, {
+          method: "GET",
+          headers: { 
+            "Authorization": `Bearer ${cleanToken.trim()}`,
+            "Content-Type": "application/json"
+          }
+        });
+
         const data = await res.json();
         if (Array.isArray(data)) {
           const plag = data.filter(s => s.score > 20).length;
@@ -61,7 +61,7 @@ const res = await fetch(`${API_BASE_URL}/history`, {
           <Typography variant="subtitle1" sx={{ color: "#94a3b8", fontWeight: "600" }}>{title}</Typography>
         </Box>
         <Typography variant="h2" fontWeight="800" sx={{ color: title === "Total Scans" ? "white" : color, fontFamily: "'Poppins', sans-serif" }}>
-          {loading ? <Skeleton width={80} sx={{ bgcolor: "#1e293b" }} /> : value}
+          {loading ? <Skeleton width={80} sx={{ bgcolor: "#1e293b", borderRadius: 1 }} /> : value}
         </Typography>
         <Typography variant="caption" sx={{ color: "#64748b" }}>{subtitle}</Typography>
         <Box sx={{ mt: 3, height: "6px", backgroundColor: color, borderRadius: "3px" }} />
@@ -70,9 +70,9 @@ const res = await fetch(`${API_BASE_URL}/history`, {
   );
 
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", height: "100vh", backgroundColor: "#000000", color: "#ffffff" }}>
+    <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh", backgroundColor: "#000000", color: "#ffffff" }}>
       <Header />
-      <Box component="main" sx={{ flexGrow: 1, overflowY: "auto", py: 8 }}>
+      <Box component="main" sx={{ flexGrow: 1, py: 8 }}>
         <Container maxWidth="lg">
           <Box sx={{ mb: 8 }}>
             <Typography variant="h3" fontWeight="800" sx={{ background: "linear-gradient(90deg, #ffffff, #60a5fa)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", mb: 1.5 }}>
@@ -81,8 +81,12 @@ const res = await fetch(`${API_BASE_URL}/history`, {
             <Typography variant="body1" sx={{ color: "#94a3b8" }}>Manage your history and view real-time integrity metrics.</Typography>
           </Box>
 
-          <Button variant="contained" startIcon={<Add />} onClick={() => navigate("/upload")} 
-            sx={{ backgroundColor: "#2563eb", borderRadius: "50px", px: 5, py: 2, mb: 8 }}>
+          <Button 
+            variant="contained" 
+            startIcon={<Add />} 
+            onClick={() => navigate("/upload")} 
+            sx={{ backgroundColor: "#2563eb", borderRadius: "50px", px: 5, py: 2, mb: 8, fontWeight: "bold", textTransform: "none" }}
+          >
             Start New Analysis
           </Button>
 

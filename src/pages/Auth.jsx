@@ -17,6 +17,7 @@ export default function Auth() {
   const [showSuccess, setShowSuccess] = useState(false);
   const [error, setError] = useState(""); 
   const [formData, setFormData] = useState({ name: "", email: "", password: "" });
+  const [loading, setLoading] = useState(false);
 
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -26,11 +27,13 @@ export default function Auth() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    setLoading(true);
 
-    // Use API_BASE_URL instead of hardcoded strings
+    // Ensure there's no double slash in the URL
+    const baseUrl = API_BASE_URL.endsWith('/') ? API_BASE_URL.slice(0, -1) : API_BASE_URL;
     const endpoint = isLogin 
-      ? `${API_BASE_URL}/login` 
-      : `${API_BASE_URL}/register`;
+      ? `${baseUrl}/login` 
+      : `${baseUrl}/register`;
 
     try {
       const response = await fetch(endpoint, {
@@ -43,10 +46,13 @@ export default function Auth() {
 
       if (response.ok) {
         if (isLogin) {
+          // Success! Save data and redirect
           localStorage.setItem("userToken", data.access_token);
-          localStorage.setItem("userName", data.user.name);
+          localStorage.setItem("userEmail", data.user.email);
+          localStorage.setItem("userName", data.user.name || "User");
           navigate("/dashboard");
         } else {
+          // Registration success
           setShowSuccess(true);
           setTimeout(() => {
             setIsLogin(true);
@@ -55,10 +61,15 @@ export default function Auth() {
           }, 2000);
         }
       } else {
-        setError(data.msg || "Something went wrong.");
+        // Show actual error message from backend
+        setError(data.msg || "Invalid credentials. Please try again.");
       }
     } catch (err) {
-      setError("Cannot connect to server. If using Render, the AI engine may be waking up—please wait 30 seconds.");
+      console.error("Auth Error:", err);
+      // Only show the wakeup message if it's truly a connection failure
+      setError("Server connection failed. If this is the first time today, the server may need 1 minute to start up. Please check your internet or try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -75,35 +86,101 @@ export default function Auth() {
   };
 
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", height: "100vh", backgroundColor: "#000000" }}>
+    <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh", backgroundColor: "#000000" }}>
       <Header />
-      <Box component="main" sx={{ flexGrow: 1, display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <Box component="main" sx={{ flexGrow: 1, display: "flex", alignItems: "center", justifyContent: "center", py: 4 }}>
         <Container maxWidth="sm">
-          <Card sx={{ backgroundColor: "#0f172a", border: "1px solid #1e293b", borderRadius: 5 }}>
-            <CardContent sx={{ p: 5 }}>
-              <Fade in={showSuccess} unmountOnExit><Alert severity="success" sx={{ mb: 3 }}>Account created! Log in now.</Alert></Fade>
-              {error && <Alert severity="error" sx={{ mb: 3 }}>{error}</Alert>}
-              <Typography variant="h4" fontWeight="800" textAlign="center" color="white" mb={4}>
+          <Card sx={{ backgroundColor: "#0f172a", border: "1px solid #1e293b", borderRadius: 5, boxShadow: "0 10px 30px rgba(0,0,0,0.5)" }}>
+            <CardContent sx={{ p: { xs: 3, md: 5 } }}>
+              <Fade in={showSuccess} unmountOnExit>
+                <Alert severity="success" sx={{ mb: 3 }}>Account created! Log in now.</Alert>
+              </Fade>
+              
+              {error && (
+                <Alert severity="error" sx={{ mb: 3, borderRadius: 2 }}>
+                  {error}
+                </Alert>
+              )}
+
+              <Typography variant="h4" fontWeight="800" textAlign="center" color="white" mb={1}>
                 {isLogin ? "Welcome Back" : "Create Account"}
               </Typography>
+              <Typography variant="body2" textAlign="center" color="#94a3b8" mb={4}>
+                {isLogin ? "Enter your details to access your dashboard" : "Sign up to start checking for plagiarism"}
+              </Typography>
+
               <Box component="form" onSubmit={handleSubmit}>
-                {!isLogin && <TextField fullWidth label="Full Name" name="name" required value={formData.name} onChange={handleInputChange} sx={inputStyle} />}
-                <TextField fullWidth label="Email Address" type="email" name="email" required value={formData.email} onChange={handleInputChange} sx={inputStyle} />
-                <TextField fullWidth label="Password" type={showPassword ? "text" : "password"} name="password" required value={formData.password} onChange={handleInputChange}
-                  InputProps={{ endAdornment: (
-                    <InputAdornment position="end">
-                      <IconButton onClick={() => setShowPassword(!showPassword)} sx={{ color: "#94a3b8" }}>
-                        {showPassword ? <VisibilityOff /> : <Visibility />}
-                      </IconButton>
-                    </InputAdornment>
-                  )}} sx={inputStyle} />
-                <Button type="submit" fullWidth variant="contained" sx={{ py: 1.5, borderRadius: "50px", bgcolor: "#2563eb", fontWeight: "bold" }}>
-                  {isLogin ? "Sign In" : "Sign Up"}
+                {!isLogin && (
+                  <TextField 
+                    fullWidth 
+                    label="Full Name" 
+                    name="name" 
+                    required 
+                    value={formData.name} 
+                    onChange={handleInputChange} 
+                    sx={inputStyle} 
+                  />
+                )}
+                <TextField 
+                  fullWidth 
+                  label="Email Address" 
+                  type="email" 
+                  name="email" 
+                  required 
+                  value={formData.email} 
+                  onChange={handleInputChange} 
+                  sx={inputStyle} 
+                />
+                <TextField 
+                  fullWidth 
+                  label="Password" 
+                  type={showPassword ? "text" : "password"} 
+                  name="password" 
+                  required 
+                  value={formData.password} 
+                  onChange={handleInputChange}
+                  InputProps={{ 
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton onClick={() => setShowPassword(!showPassword)} sx={{ color: "#94a3b8" }}>
+                          {showPassword ? <VisibilityOff /> : <Visibility />}
+                        </IconButton>
+                      </InputAdornment>
+                    )
+                  }} 
+                  sx={inputStyle} 
+                />
+                <Button 
+                  type="submit" 
+                  fullWidth 
+                  variant="contained" 
+                  disabled={loading}
+                  sx={{ 
+                    py: 1.5, 
+                    mt: 1,
+                    borderRadius: "50px", 
+                    bgcolor: "#2563eb", 
+                    fontWeight: "bold",
+                    textTransform: "none",
+                    fontSize: "1rem",
+                    "&:hover": { bgcolor: "#1d4ed8" }
+                  }}
+                >
+                  {loading ? "Processing..." : (isLogin ? "Sign In" : "Sign Up")}
                 </Button>
               </Box>
+
               <Typography textAlign="center" sx={{ mt: 3, color: "#94a3b8" }}>
-                {isLogin ? "New here? " : "Member? "}
-                <Link component="button" onClick={() => setIsLogin(!isLogin)} sx={{ color: "#3b82f6", fontWeight: "700" }}>
+                {isLogin ? "New here? " : "Already a member? "}
+                <Link 
+                  component="button" 
+                  type="button"
+                  onClick={() => {
+                    setIsLogin(!isLogin);
+                    setError("");
+                  }} 
+                  sx={{ color: "#3b82f6", fontWeight: "700", textDecoration: "none" }}
+                >
                   {isLogin ? "Create account" : "Sign in instead"}
                 </Link>
               </Typography>

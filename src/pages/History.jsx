@@ -24,18 +24,16 @@ export default function History() {
         return;
       }
 
-      // Handle potential double-quotes in local storage
       const cleanToken = token.startsWith('"') ? JSON.parse(token) : token;
 
       try {
-        // --- UPDATED TO LIVE RENDER URL ---
         const response = await fetch(`${API_BASE_URL}/history`, {
-    method: "GET",
-    headers: { 
-        "Authorization": `Bearer ${cleanToken.trim()}`,
-        "Content-Type": "application/json"
-    }
-});
+          method: "GET",
+          headers: { 
+            "Authorization": `Bearer ${cleanToken.trim()}`,
+            "Content-Type": "application/json"
+          }
+        });
 
         const data = await response.json();
         if (response.ok) {
@@ -48,7 +46,7 @@ export default function History() {
           setError(data.msg || "Failed to load history.");
         }
       } catch (err) {
-        setError("Backend unreachable. The AI engine might be waking up, please refresh in 30 seconds.");
+        setError("Cannot connect to server. The AI engine might be waking up—please try again in a minute.");
       } finally {
         setLoading(false);
       }
@@ -74,121 +72,60 @@ export default function History() {
   );
 
   return (
-    <Box sx={{ 
-      display: "flex", 
-      flexDirection: "column", 
-      height: "100vh", 
-      overflow: "hidden", 
-      backgroundColor: "#000000",
-      fontFamily: "'Inter', sans-serif"
-    }}>
+    <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh", backgroundColor: "#000000" }}>
       <Header />
-
-      <Box component="main" sx={{ 
-        flexGrow: 1, 
-        overflowY: "auto", 
-        py: 8,
-        px: 2,
-        "&::-webkit-scrollbar": { width: "8px" },
-        "&::-webkit-scrollbar-track": { background: "#000" },
-        "&::-webkit-scrollbar-thumb": { background: "#1e293b", borderRadius: "10px" }
-      }}>
+      <Box component="main" sx={{ flexGrow: 1, py: 8, px: 2 }}>
         <Container maxWidth="lg">
           <Box sx={{ mb: 6, textAlign: "center" }}>
             <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mb: 1, gap: 1.5 }}>
-                <HistoryIcon sx={{ color: "#60a5fa", fontSize: "2rem" }} />
-                <Typography variant="h3" fontWeight="800" sx={{ 
-                    background: "linear-gradient(90deg, #ffffff, #60a5fa)", 
-                    WebkitBackgroundClip: "text", 
-                    WebkitTextFillColor: "transparent",
-                    fontFamily: "'Poppins', sans-serif",
-                    letterSpacing: "-0.02em"
-                }}>
+              <HistoryIcon sx={{ color: "#60a5fa", fontSize: "2rem" }} />
+              <Typography variant="h3" fontWeight="800" sx={{ 
+                background: "linear-gradient(90deg, #ffffff, #60a5fa)", 
+                WebkitBackgroundClip: "text", 
+                WebkitTextFillColor: "transparent",
+                fontFamily: "'Poppins', sans-serif"
+              }}>
                 Scan History
-                </Typography>
+              </Typography>
             </Box>
-            <Typography variant="body1" sx={{ color: "#94a3b8" }}>
-              Review and revisit your previous semantic analysis reports.
-            </Typography>
-            {error && <Alert severity="error" sx={{ mt: 3, borderRadius: 2, bgcolor: "#1a0505", color: "#fca5a5", border: "1px solid #7f1d1d" }}>{error}</Alert>}
+            <Typography variant="body1" sx={{ color: "#94a3b8" }}>Review and revisit your previous semantic analysis reports.</Typography>
+            {error && <Alert severity="error" sx={{ mt: 3, borderRadius: 2 }}>{error}</Alert>}
           </Box>
 
-          <TableContainer component={Paper} sx={{ 
-            backgroundColor: "#0f172a", 
-            border: "1px solid #1e293b", 
-            borderRadius: 5, 
-            boxShadow: "0px 10px 30px rgba(0,0,0,0.5)",
-            mb: 4 
-          }}>
+          <TableContainer component={Paper} sx={{ backgroundColor: "#0f172a", border: "1px solid #1e293b", borderRadius: 5, boxShadow: "0px 10px 30px rgba(0,0,0,0.5)", mb: 4 }}>
             <Table sx={{ minWidth: 650 }}>
               <TableHead sx={{ backgroundColor: "#1e293b" }}>
                 <TableRow>
-                  <TableCell sx={{ color: "#60a5fa", fontWeight: "700", fontFamily: "'Poppins', sans-serif" }}>Document Preview</TableCell>
-                  <TableCell sx={{ color: "#60a5fa", fontWeight: "700", fontFamily: "'Poppins', sans-serif" }}>Analysis Date</TableCell>
-                  <TableCell sx={{ color: "#60a5fa", fontWeight: "700", fontFamily: "'Poppins', sans-serif" }}>Plagiarism Score</TableCell>
-                  <TableCell sx={{ color: "#60a5fa", fontWeight: "700", fontFamily: "'Poppins', sans-serif" }}>Risk Level</TableCell>
-                  <TableCell align="right" sx={{ color: "#60a5fa", fontWeight: "700", fontFamily: "'Poppins', sans-serif" }}>Actions</TableCell>
+                  <TableCell sx={{ color: "#60a5fa", fontWeight: "700" }}>Document Preview</TableCell>
+                  <TableCell sx={{ color: "#60a5fa", fontWeight: "700" }}>Analysis Date</TableCell>
+                  <TableCell sx={{ color: "#60a5fa", fontWeight: "700" }}>Plagiarism Score</TableCell>
+                  <TableCell sx={{ color: "#60a5fa", fontWeight: "700" }}>Risk Level</TableCell>
+                  <TableCell align="right" sx={{ color: "#60a5fa", fontWeight: "700" }}>Actions</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {historyData.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={5} sx={{ color: "#94a3b8", textAlign: "center", py: 10 }}>
-                        <Typography variant="h6" sx={{ opacity: 0.5 }}>No history found yet.</Typography>
-                    </TableCell>
+                    <TableCell colSpan={5} sx={{ color: "#94a3b8", textAlign: "center", py: 10 }}>No history found yet.</TableCell>
                   </TableRow>
                 ) : (
                   historyData.map((row) => (
-                    <TableRow 
-                        key={row.id} 
-                        sx={{ 
-                            "&:hover": { backgroundColor: "rgba(59, 130, 246, 0.03)" }, 
-                            transition: "0.2s",
-                            "& .MuiTableCell-root": { borderBottom: "1px solid #1e293b" }
-                        }}
-                    >
-                      <TableCell sx={{ color: "#f8fafc", fontWeight: "500" }}>
+                    <TableRow key={row.id} sx={{ "&:hover": { backgroundColor: "rgba(59, 130, 246, 0.03)" }, transition: "0.2s" }}>
+                      <TableCell sx={{ color: "#f8fafc" }}>
                         <Box sx={{ display: "flex", alignItems: "center" }}>
-                          <Description sx={{ mr: 1.5, color: "#3b82f6", fontSize: "1.2rem" }} />
+                          <Description sx={{ mr: 1.5, color: "#3b82f6" }} />
                           {row.full_text ? `${row.full_text.substring(0, 35)}...` : "Unnamed Document"}
                         </Box>
                       </TableCell>
                       <TableCell sx={{ color: "#94a3b8" }}>{row.date}</TableCell>
                       <TableCell sx={{ color: "#ffffff", fontWeight: "700" }}>
-                        <Typography variant="body1" sx={{ fontWeight: "800", color: getStatusColor(row.status) }}>
-                            {row.score}%
-                        </Typography>
+                        <Typography variant="body1" sx={{ fontWeight: "800", color: getStatusColor(row.status) }}>{row.score}%</Typography>
                       </TableCell>
                       <TableCell>
-                        <Chip 
-                            label={row.status} 
-                            size="small" 
-                            sx={{ 
-                                border: `1px solid ${getStatusColor(row.status)}`, 
-                                color: getStatusColor(row.status), 
-                                fontWeight: "800", 
-                                bgcolor: "transparent",
-                                textTransform: "uppercase",
-                                fontSize: "0.7rem",
-                                letterSpacing: "0.05em"
-                            }} 
-                        />
+                        <Chip label={row.status} size="small" sx={{ border: `1px solid ${getStatusColor(row.status)}`, color: getStatusColor(row.status), fontWeight: "800", bgcolor: "transparent" }} />
                       </TableCell>
                       <TableCell align="right">
-                        <IconButton 
-                          onClick={() => navigate("/results", { 
-                            state: { 
-                                score: row.score, 
-                                text: row.full_text, 
-                                analysis: row.analysis,
-                                ai_insight: row.ai_insight 
-                            } 
-                          })} 
-                          sx={{ 
-                              color: "#3b82f6",
-                              "&:hover": { backgroundColor: "rgba(59, 130, 246, 0.1)", color: "#60a5fa" }
-                          }}
-                        >
+                        <IconButton onClick={() => navigate("/results", { state: row })} sx={{ color: "#3b82f6" }}>
                           <Visibility />
                         </IconButton>
                       </TableCell>
@@ -200,7 +137,6 @@ export default function History() {
           </TableContainer>
         </Container>
       </Box>
-
       <Footer />
     </Box>
   );
