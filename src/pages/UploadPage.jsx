@@ -7,6 +7,7 @@ import { CloudUpload, TextFields } from "@mui/icons-material";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { useNavigate } from "react-router-dom";
+import { API_BASE_URL } from "../config";
 
 export default function Upload() {
   const navigate = useNavigate();
@@ -41,12 +42,12 @@ export default function Upload() {
 
     try {
       // --- UPDATED TO RENDER URL ---
-      const response = await fetch("https://ai-plagiarism-backend.onrender.com/analyze", {
-        method: "POST",
-        headers: { "Authorization": `Bearer ${cleanToken.trim()}` },
-        body: formData
-      });
       
+      const response = await fetch(`${API_BASE_URL}/history`, {
+    method: "POST",
+    headers: { 
+        "Authorization": `Bearer ${cleanToken.trim()}`,},body:formData
+});
       const data = await response.json();
 
       if (response.ok) {

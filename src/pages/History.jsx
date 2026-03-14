@@ -7,6 +7,7 @@ import { Visibility, Description, History as HistoryIcon } from "@mui/icons-mate
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { useNavigate } from "react-router-dom";
+import { API_BASE_URL } from "../config";
 
 export default function History() {
   const navigate = useNavigate();
@@ -28,13 +29,13 @@ export default function History() {
 
       try {
         // --- UPDATED TO LIVE RENDER URL ---
-        const response = await fetch("https://plagirism-backend.onrender.com/history", {
-          method: "GET",
-          headers: { 
-            "Authorization": `Bearer ${cleanToken.trim()}`,
-            "Content-Type": "application/json"
-          }
-        });
+        const response = await fetch(`${API_BASE_URL}/history`, {
+    method: "GET",
+    headers: { 
+        "Authorization": `Bearer ${cleanToken.trim()}`,
+        "Content-Type": "application/json"
+    }
+});
 
         const data = await response.json();
         if (response.ok) {

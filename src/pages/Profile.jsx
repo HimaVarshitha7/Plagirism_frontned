@@ -6,6 +6,7 @@ import {
 import { Person, BarChart } from "@mui/icons-material";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import { API_BASE_URL } from "../config";
 
 export default function Profile() {
   const [isEditing, setIsEditing] = useState(false);
@@ -26,8 +27,7 @@ export default function Profile() {
     const cleanToken = token.startsWith('"') ? JSON.parse(token) : token;
 
     try {
-      // --- UPDATED TO LIVE RENDER URL ---
-      const response = await fetch("https://plagirism-backend.onrender.com/profile", {
+      const response = await fetch(`${API_BASE_URL}/profile`, {
         method: "GET",
         headers: { 
           "Authorization": `Bearer ${cleanToken.trim()}`,
@@ -45,7 +45,7 @@ export default function Profile() {
         setError(errorData.msg || "Error loading profile.");
       }
     } catch (err) {
-      setError("Backend unreachable. The server might be waking up, please refresh in 30 seconds.");
+      setError("Backend unreachable. Check if Flask is running.");
     } finally {
       setLoading(false);
     }
@@ -61,8 +61,8 @@ export default function Profile() {
     const cleanToken = token.startsWith('"') ? JSON.parse(token) : token;
 
     try {
-      // --- UPDATED TO LIVE RENDER URL ---
-      const response = await fetch("https://plagirism-backend.onrender.com/profile", {
+      // Fixed the endpoint to /profile and corrected the fetch syntax
+      const response = await fetch(`${API_BASE_URL}/profile`, {
         method: "PUT",
         headers: { 
           "Authorization": `Bearer ${cleanToken.trim()}`,
@@ -80,7 +80,7 @@ export default function Profile() {
         setError("Failed to save profile.");
       }
     } catch (err) {
-      setError("Error connecting to server. Please try again.");
+      setError("Error connecting to server.");
     }
   };
 
