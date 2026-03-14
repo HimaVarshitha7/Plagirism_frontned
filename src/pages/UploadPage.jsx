@@ -43,10 +43,12 @@ export default function Upload() {
     try {
       // --- UPDATED TO RENDER URL ---
       
-      const response = await fetch(`${API_BASE_URL}/history`, {
-    method: "GET",
-    headers: { 
-        "Authorization": `Bearer ${cleanToken.trim()}`,},body:formData
+      const response = await fetch(`${API_BASE_URL}/analyze`, {
+  method: "POST",
+  headers: {
+    Authorization: `Bearer ${cleanToken.trim()}`
+  },
+  body: formData
 });
       const data = await response.json();
 
@@ -66,7 +68,7 @@ export default function Upload() {
         setError(data.msg || "Analysis failed.");
       }
     } catch (err) {
-      setError("Server connection failed. Your AI model is still waking up on Render, please wait 1 minute and try again.");
+      setError("Server connection failed. Please try again in a moment.");
     } finally {
       setLoading(false);
     }
