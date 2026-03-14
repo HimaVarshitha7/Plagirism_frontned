@@ -23,13 +23,14 @@ export default function Dashboard() {
         const cleanToken = token.startsWith('"') ? JSON.parse(token) : token;
 
         // --- UPDATED TO LIVE RENDER URL ---
-        const res = await fetch("https://plagirism-backend.onrender.com/history", {
-          headers: { 
-            "Authorization": `Bearer ${cleanToken.trim()}`,
-            "Content-Type": "application/json"
-          }
-        });
-
+       
+const res = await fetch(`${API_BASE_URL}/history`, {
+   method: "GET",
+    headers: { 
+        "Authorization": `Bearer ${cleanToken.trim()}`,
+        "Content-Type": "application/json"
+    }
+});
         const data = await res.json();
         if (Array.isArray(data)) {
           const plag = data.filter(s => s.score > 20).length;
