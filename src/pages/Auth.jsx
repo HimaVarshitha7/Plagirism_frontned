@@ -7,6 +7,8 @@ import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+// Import the configuration
+import { API_BASE_URL } from "../config";
 
 export default function Auth() {
   const navigate = useNavigate();
@@ -25,9 +27,10 @@ export default function Auth() {
     e.preventDefault();
     setError("");
 
+    // Use API_BASE_URL instead of hardcoded strings
     const endpoint = isLogin 
-      ? "https://plagirism-backend.onrender.com/login" 
-      : "https://plagirism-backend.onrender.com/register";
+      ? `${API_BASE_URL}/login` 
+      : `${API_BASE_URL}/register`;
 
     try {
       const response = await fetch(endpoint, {
@@ -55,7 +58,7 @@ export default function Auth() {
         setError(data.msg || "Something went wrong.");
       }
     } catch (err) {
-      setError("Cannot connect to server. The AI engine is waking up on Render, please wait 30 seconds and try again.");
+      setError("Cannot connect to server. If using Render, the AI engine may be waking up—please wait 30 seconds.");
     }
   };
 
