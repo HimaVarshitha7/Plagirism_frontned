@@ -44,7 +44,7 @@ export default function Upload() {
       // --- UPDATED TO RENDER URL ---
       
       const response = await fetch(`${API_BASE_URL}/history`, {
-    method: "POST",
+    method: "GET",
     headers: { 
         "Authorization": `Bearer ${cleanToken.trim()}`,},body:formData
 });
