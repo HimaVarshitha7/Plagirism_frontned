@@ -40,7 +40,8 @@ export default function Upload() {
     }
 
     try {
-      const response = await fetch("http://127.0.0.1:5000/analyze", {
+      // --- UPDATED TO RENDER URL ---
+      const response = await fetch("https://ai-plagiarism-backend.onrender.com/analyze", {
         method: "POST",
         headers: { "Authorization": `Bearer ${cleanToken.trim()}` },
         body: formData
@@ -49,13 +50,12 @@ export default function Upload() {
       const data = await response.json();
 
       if (response.ok) {
-        // Passing all AI data to the Results page
         navigate("/results", { 
           state: { 
             score: data.percentage, 
             text: data.extracted_text, 
             analysis: data.analysis,
-            ai_insight: data.ai_insight // AI Gemini explanation
+            ai_insight: data.ai_insight 
           } 
         });
       } else if (response.status === 401) {
@@ -65,7 +65,7 @@ export default function Upload() {
         setError(data.msg || "Analysis failed.");
       }
     } catch (err) {
-      setError("Server connection failed. Check if Flask is running.");
+      setError("Server connection failed. Your AI model is still waking up on Render, please wait 1 minute and try again.");
     } finally {
       setLoading(false);
     }
